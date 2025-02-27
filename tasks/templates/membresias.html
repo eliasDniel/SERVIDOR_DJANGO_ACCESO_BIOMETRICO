@@ -1,0 +1,51 @@
+{% extends 'base.html' %} {% block content %}
+<main class="container-fluid px-5">
+  <div class="d-flex justify-content-between align-items-center py-2">
+    <h1 class="display-3">Membresias</h1>
+    <a href="{% url 'crear_membresias' %}" class="btn btn-primary d-flex align-items-center justify-content-center">
+      <i class="fas fa-plus me-2"></i> Crear Membresias
+    </a>
+  </div>
+  
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Tipo</th>
+        <th scope="col">Cliente</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Fecha inicio</th>
+        <th scope="col">Fecha fin</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for membresia in membresias %}
+      <tr>
+        <th scope="row">{{ membresia.id }}</th>
+        <td>{{ membresia.tipo }}</td>
+        <td>{{ membresia.cliente.nombre }}</td>
+        <td>{{ membresia.estado }}</td>
+        <td>{{ membresia.fecha_inicio }}</td>
+        <td>{{ membresia.fecha_fin }}</td>
+        <td>
+          <!-- Icono para Ver -->
+          <a href="{% url 'membresia_detail' membresia.id%}" class="btn btn-sm btn-info" title="Ver">
+            <i class="fas fa-eye"></i>
+          </a>
+          <!-- Icono para Eliminar -->
+          <form action="{% url 'delete_membresia' membresia.id%}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</main>
+{% endblock %}

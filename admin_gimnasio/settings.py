@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from decouple import config
 from pathlib import Path
 import os
 import dj_database_url
@@ -82,6 +83,15 @@ WSGI_APPLICATION = 'admin_gimnasio.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
+    # "default": {
+    #     'ENGINE': config("DB_ENGINE", default="django.db.backends.postgresql"),
+    #     'NAME': config("DB_DATABASE", default=""),
+    #     'USER': config("DB_USERNAME", default=""),
+    #     'PASSWORD': config("DB_PASSWORD", default=""),
+    #     'HOST': config("DB_SOCKET", default=""),
+    #     'PORT': config("DB_PORT", default="5432"),
+    #     'ATOMIC_REQUESTS': True
+    # }
     'default': dj_database_url.config(
         default='postgresql://postgres:postgres@localhost/postgres',
         conn_max_age=600
