@@ -2,44 +2,64 @@
 
 <main class="container">
   <div class="row">
-    <div class="col-md-4 offset-md-4 mt-5">
+    <div class="col-md-6 offset-md-3 mt-5">
       <form method="POST" class="card card-body">
-        <h1 class="display-1 text-center mb-2">Signup</h1>
+        <h1 class="display-1 text-center mb-2">Registrate</h1>
         {% csrf_token %}
         <div class="mb-3">
-          <label for="username">Username:</label>
+          <label for="username" class="mb-1">Usuario:</label>
           <input
             type="text"
             name="username"
             id="username"
-            placeholder="Write your username"
+            placeholder="Ingresa tu usuario"
             class="form-control"
           />
         </div>
         <div class="mb-3">
-          <label for="password1">Password:</label>
+          <label for="password1" class="mb-1">Contraseña:</label>
           <input
             type="password"
             name="password1"
             id="password1"
-            placeholder="Write your password"
+            placeholder="Ingresa una contraseña"
             class="form-control"
+            required
           />
         </div>
         <div class="mb-3">
-          <label for="password2">Confirm password:</label>
+          <label for="password2" class="mb-1">Confirmar contraseña:</label>
           <input
             type="password"
             name="password2"
             id="password2"
-            placeholder="Write confirm your password"
+            placeholder="Confirma tu contraseña"
             class="form-control"
+            required
           />
         </div>
 
-        <button class="btn btn-primary">Signup</button>
+        <button class="btn btn-primary">Registrarse</button>
       </form>
     </div>
   </div>
 </main>
+<script>
+  // Mensaje de éxito
+  {% if messages %}
+    {% for message in messages %}
+    Swal.fire({
+      icon: "{{ message.tags }}", // 'success', 'error', etc.
+      title: "{{ message }}",
+      showConfirmButton: false,
+      timer: 2000 // Duración del mensaje
+    }).then(() => {
+      {% if redirect_url %}
+        // Redirige después del mensaje
+        window.location.href = "{{ redirect_url }}";
+      {% endif %}
+    });
+    {% endfor %}
+  {% endif %}
+</script>
 {%endblock%}

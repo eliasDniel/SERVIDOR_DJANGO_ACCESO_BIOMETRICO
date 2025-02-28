@@ -25,15 +25,19 @@
     <tbody>
       {% for cliente in clientes %}
       <tr>
-        <th scope="row">{{ cliente.id }}</th>
+        <th scope="row">{{ forloop.counter }}</th>
         <td>{{ cliente.nombre }}</td>
         <td>{{ cliente.correo }}</td>
         <td>{{ cliente.telefono }}</td>
         <td>{{ cliente.genero }}</td>
         <td>
           <!-- Icono para Ver -->
-          <a href="{% url 'cliente_detail' cliente.id%}" class="btn btn-sm btn-info" title="Ver">
+          <a href="{% url 'view_cliente' cliente.id%}" class="btn btn-sm btn-info" title="Ver">
             <i class="fas fa-eye"></i>
+          </a>
+
+          <a href="{% url 'cliente_detail' cliente.id%}" class="btn btn-sm btn-secondary" title="Ver">
+            <i class="fas fa-edit"></i>
           </a>
           <!-- Icono para Eliminar -->
           <form action="{% url 'delete_cliente' cliente.id %}" method="post" style="display:inline;">

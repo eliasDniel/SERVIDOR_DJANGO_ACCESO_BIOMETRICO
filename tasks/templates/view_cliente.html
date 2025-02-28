@@ -1,0 +1,22 @@
+{% extends 'base.html' %} 
+{% block content %}
+<main class="container py-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card card-body shadow">
+        <h1 class="text-center">{{ cliente.nombre }}</h1>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Correo:</strong> {{ cliente.correo }}</li>
+          <li class="list-group-item"><strong>Teléfono:</strong> {{ cliente.telefono|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>Género:</strong> {{ cliente.genero|default:"No especificado" }}</li>
+        </ul>
+        <div class="text-center mt-4">
+          <a href="{% url 'cliente_detail' cliente.id %}" class="btn btn-primary">
+            Actualizar
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

@@ -1,13 +1,32 @@
 {% extends 'base.html' %} {%block content%}
 <main class="container">
   <div class="row">
-    <div class="col-md-4 offset-md-4">
+    <div class="col-md-8 offset-md-2">
+      <form action="{% url 'crear_membresias' %}" method="POST" class="card card-body shadow">
       <h1>Crear Membresia</h1>
-      <form action="/membresias/create/" method="POST" class="card card-body">
         {% csrf_token %}{{form.as_p}}
-        <button class="btn btn-primary">Guardar</button>
+        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
       </form>
     </div>
   </div>
 </main>
+
+<script>
+  // Mensaje de éxito
+  {% if messages %}
+    {% for message in messages %}
+    Swal.fire({
+      icon: "{{ message.tags }}", // 'success', 'error', etc.
+      title: "{{ message }}",
+      showConfirmButton: false,
+      timer: 2000 // Duración del mensaje
+    }).then(() => {
+      {% if redirect_url %}
+        // Redirige después del mensaje
+        window.location.href = "{{ redirect_url }}";
+      {% endif %}
+    });
+    {% endfor %}
+  {% endif %}
+</script>
 {%endblock%}

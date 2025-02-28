@@ -8,6 +8,11 @@ from .forms import TasksForm,ClienteForm,MembresiaForm
 from .models import Task,Cliente,Membresia
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.contrib import messages 
+from django.db import models
+
+
 # Create your views here.
 
 #VISTA HOME
@@ -22,19 +27,42 @@ def clientes(request):
 @login_required
 def membresias(request):
     membresias = Membresia.objects.all().order_by('id')
-    return render(request, 'membresias.html',{'membresias':membresias})
+    clientes = Cliente.objects.all().order_by('id')
+    
+    # Calcular la cantidad total
+    total_membresias = membresias.count()
+    total_clientes = clientes.count()
+    
+    # Calcular ingresos y egresos
+    ingresos = membresias.filter(tipo__in=['VIP', 'Premium', 'Familiar']).aggregate(total=models.Sum('precio'))['total'] or 0
+    egresos = membresias.exclude(tipo__in=['VIP', 'Premium', 'Familiar']).aggregate(total=models.Sum('precio'))['total'] or 0
+
+    return render(request, 'membresias.html', {
+        'membresias': membresias,
+        'clientes': clientes,
+        'total_membresias': total_membresias,
+        'total_clientes': total_clientes,
+        'ingresos': ingresos,
+        'egresos': egresos
+    })
+
+
 @login_required
 def crear_cliente(request):
     if request.method == 'GET':
-        return render(request,'crear_cliente.html',{'form':ClienteForm})
+        return render(request, 'crear_cliente.html', {'form': ClienteForm})
     else:
-        try:
-            form = ClienteForm(request.POST)
-            new_cliente = form.save(commit=False)
-            new_cliente.save()
-            return redirect('clientes')
-        except ValueError:
-            return render(request,'crear_cliente.html',{'form':ClienteForm,'error':'Datos Invalidos'})
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cliente creado con éxito.')
+            return render(request, 'crear_cliente.html', {
+                'form': ClienteForm,
+                'redirect_url': reverse('clientes')  # URL a la que redirigir
+            })
+        else:
+            messages.error(request, 'Error al crear el cliente. Revisa los campos.')
+            return render(request, 'crear_cliente.html', {'form': form})
 
 @login_required 
 def cliente_detail(request,cliente_id):
@@ -43,14 +71,30 @@ def cliente_detail(request,cliente_id):
         form = ClienteForm(instance=cliente)
         return render(request,'cliente_detail.html',{'cliente':cliente,'form':form})
     else:
-        try:
-            cliente = get_object_or_404(Cliente,pk=cliente_id)
-            form = ClienteForm(request.POST,instance=cliente)
+    
+        cliente = get_object_or_404(Cliente,pk=cliente_id)
+        form = ClienteForm(request.POST,instance=cliente)
+        if form.is_valid():
             form.save()
-            return redirect('clientes')
+            messages.success(request, 'Cliente actualizado con éxito.')
+            return render(request, 'cliente_detail.html', {
+            'form': ClienteForm,
+            'redirect_url': reverse('clientes')  # URL a la que redirigir
+        })
+        else:
+            messages.error(request, 'Datos Invalidos')
+            return render(request, 'cliente_detail.html', {
+            'form': ClienteForm,
+             # URL a la que redirigir
+        })
+                
 
-        except ValueError:
-            return render(request,'cliente_detail.html',{'cliente':cliente,'form':form,'error':'Error al actualizar'})
+@login_required 
+def view_cliente(request,cliente_id):
+    cliente = get_object_or_404(Cliente,pk=cliente_id)
+    return render(request,'view_cliente.html',{'cliente':cliente})
+
+    
 
 
 
@@ -61,27 +105,37 @@ def membresia_detail(request,membresia_id):
         form = MembresiaForm(instance=membresia)
         return render(request,'membresia_detail.html',{'membresia':membresia,'form':form})
     else:
-        try:
-            membresia = get_object_or_404(Membresia,pk=membresia_id)
-            form = MembresiaForm(request.POST,instance=membresia)
+        membresia = get_object_or_404(Membresia,pk=membresia_id)
+        form = MembresiaForm(request.POST,instance=membresia)
+        if form.is_valid():
             form.save()
-            return redirect('membresias')
-
-        except ValueError:
-            return render(request,'membresia_detail.html',{'membresia':membresia,'form':form,'error':'Error al actualizar'})
+            messages.success(request, 'Membresia actualizada con éxito.')
+            return render(request, 'membresia_detail.html', {
+            'form': MembresiaForm,
+            'redirect_url': reverse('membresias')  # URL a la que redirigir
+        })
+        else:
+            messages.error(request, 'Membresia actualizada con éxito.')
+            return render(request, 'membresia_detail.html', {
+            'form': MembresiaForm,
+        })
 
 @login_required
 def crear_membresia(request):
     if request.method == 'GET':
         return render(request,'crear_membresias.html',{'form':MembresiaForm})
     else:
-        try:
-            form = MembresiaForm(request.POST)
-            new_membresia = form.save(commit=False)
-            new_membresia.save()
-            return redirect('membresias')
-        except ValueError:
-            return render(request,'crear_membresias.html',{'form':MembresiaForm,'error':'Datos Invalidos'})
+        form = MembresiaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Membresia creada con éxito.')
+            return render(request, 'crear_membresias.html', {
+                'form': MembresiaForm,
+                'redirect_url': reverse('membresias')  # URL a la que redirigir
+            })
+        else:
+            messages.error(request, 'Error al crear la membresia. Revisa los campos.')
+            return render(request, 'crear_membresias.html', {'form': form})
     
        
 def signup(request):
@@ -91,20 +145,24 @@ def signup(request):
     })
     else:
         if request.POST['password1'] ==  request.POST['password2']:
-            #register user
-            try:
-                user = User.objects.create_user(username=request.POST['username'],password=request.POST['password1'])
+            user = User.objects.create_user(username=request.POST['username'],password=request.POST['password1'])
+            if user is not None:
                 user.save()
                 login(request,user)
-                return redirect('tasks')
-            except IntegrityError:
+                messages.success(request,f'Usuario {request.user.username} creado exitosamente!!')
+                return render(request, 'signup.html', {
+                'form': MembresiaForm,
+                'redirect_url': reverse('membresias')  # URL a la que redirigir
+            })
+            else:
+                messages.error(request,'Usuario ya existe')
                 return render(request,'signup.html',{
-       'form':UserCreationForm,
-       'error':'Usuario ya existe'
+       'form':UserCreationForm
     })
-        return render(request,'signup.html',{
-       'form':UserCreationForm,
-       'error':'Contraseñas no coinciden'
+        else:
+            messages.error(request,'Contraseñas no coinciden')
+            return render(request,'signup.html',{
+       'form':UserCreationForm
     })
         
         
@@ -209,10 +267,15 @@ def signin(request):
     else:
         user = authenticate(request,username=request.POST['username'],password=request.POST['password'])
         if user is None:
+            messages.error(request,'Credenciales incorrectas')
             return render(request,'signin.html',{
                 'form':AuthenticationForm,
-                'error':'Username or Password son incorrectos'
+                
                 })
         else:
             login(request,user)
-            return redirect('membresias')
+            messages.success(request,f'Bienvenido {request.user.username}')
+            return render(request, 'signin.html', {
+                'form': MembresiaForm,
+                'redirect_url': reverse('membresias')  # URL a la que redirigir
+            })
