@@ -1,0 +1,112 @@
+
+{% extends 'base.html' %} {% block content %}
+{% load static %}
+<div class="cardBox">
+  <div class="card">
+    <div>
+      <div class="numbers">{{total_membresias}}</div>
+      <div class="cardName">Membresias</div>
+    </div>
+
+    <div class="iconBx">
+      <ion-icon name="card-outline"></ion-icon>
+    </div>
+  </div>
+
+  <div class="card">
+    <div>
+      <div class="numbers">{{total_clientes}}</div>
+      <div class="cardName">Clientes</div>
+    </div>
+
+    <div class="iconBx">
+      <ion-icon name="people-outline"></ion-icon>
+    </div>
+  </div>
+
+  <div class="card">
+    <div>
+      <div class="numbers">${{ingresos}}</div>
+      <div class="cardName">Ingresos</div>
+    </div>
+
+    <div class="iconBx">
+      <ion-icon name="cash-outline"></ion-icon>
+    </div>
+  </div>
+
+  <div class="card">
+    <div>
+      <div class="numbers">${{egresos}}</div>
+      <div class="cardName">Egresos</div>
+    </div>
+
+    <div class="iconBx">
+      <ion-icon name="cash-outline"></ion-icon>
+    </div>
+  </div>
+</div>
+<div class="details">
+  <div class="recentOrders">
+    <div class="cardHeader">
+      <h2>Membresias recientes</h2>
+      <a href="#" class="btn">View All</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <td>#</td>
+          <td>Tipo</td>
+          <td>Precio</td>
+          <td>Cliente</td>
+          <td>Estado</td>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for membresia in membresias %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ membresia.tipo }}</td>
+          <td>${{ membresia.precio }}</td>
+          <td>{{ membresia.cliente }}</td>
+          <td>
+            <span
+              class="status {% if membresia.estado == 'Activa' %}delivered {% elif membresia.estado == 'Suspendida' %}inProgress {% elif membresia.estado == 'Expirada' %}return {% else %}unknown{% endif %}"
+            >
+              {{ membresia.estado }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================= New Customers ================ -->
+  <div class="recentCustomers">
+    <div class="cardHeader">
+        <h2>Clientes Recientes</h2>
+    </div>
+
+    <table>
+      {%for cliente in clientes%}
+        <tr>
+          <td width="60px">
+            <div class="imgBx"><img src="{% static 'images/customer02.jpg' %}" alt=""></div>
+        </td>
+            <td>
+                <h4>{{cliente.nombre}} <br> <span>{{cliente.telefono}}</span></h4>
+            </td>
+        </tr>
+
+        {%endfor%}
+    </table>
+</div>
+</div>
+</div>
+</div>
+
+  
+  {% endblock %}
+</div>

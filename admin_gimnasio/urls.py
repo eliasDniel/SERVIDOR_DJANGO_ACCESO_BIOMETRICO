@@ -20,7 +20,7 @@ from tasks import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.membresias, name='membresias'),
+    path('',views.dasboard, name='dasboard'),
     path('signup/',views.signup,name='signup'),
     path('tasks/',views.tasks,name="tasks"),
     path('clientes/',views.clientes,name="clientes"),

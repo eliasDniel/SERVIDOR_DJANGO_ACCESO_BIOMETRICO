@@ -24,8 +24,13 @@ def home(request):
 def clientes(request):
     clientes = Cliente.objects.all().order_by('id')
     return render(request, 'clientes.html',{'clientes':clientes})
+
 @login_required
 def membresias(request):
+    membresias = Membresia.objects.all().order_by('id')
+    return render(request, 'membresias.html',{'membresias':membresias})
+@login_required
+def dasboard(request):
     membresias = Membresia.objects.all().order_by('id')
     clientes = Cliente.objects.all().order_by('id')
     
@@ -37,7 +42,7 @@ def membresias(request):
     ingresos = membresias.filter(tipo__in=['VIP', 'Premium', 'Familiar']).aggregate(total=models.Sum('precio'))['total'] or 0
     egresos = membresias.exclude(tipo__in=['VIP', 'Premium', 'Familiar']).aggregate(total=models.Sum('precio'))['total'] or 0
 
-    return render(request, 'membresias.html', {
+    return render(request, 'dasboard.html', {
         'membresias': membresias,
         'clientes': clientes,
         'total_membresias': total_membresias,
