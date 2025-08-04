@@ -13,11 +13,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from decouple import config
 from pathlib import Path
 import os
-import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -26,14 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY',default='your secret key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ
+DEBUG = True
 
-ALLOWED_HOSTS = []
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -44,8 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'tasks'
+    'app_seguridad_acceso_biometrico',
+    'channels'
 ]
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,12 +58,11 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
-ROOT_URLCONF = 'admin_gimnasio.urls'
+ROOT_URLCONF = 'API_DJANGO_MONITOIREO_SEGURIDAD.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,26 +75,40 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'admin_gimnasio.wsgi.application'
-
+WSGI_APPLICATION = 'API_DJANGO_MONITOIREO_SEGURIDAD.wsgi.application'
+ASGI_APPLICATION = 'API_DJANGO_MONITOIREO_SEGURIDAD.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # "default": {
-    #     'ENGINE': config("DB_ENGINE", default="django.db.backends.postgresql"),
-    #     'NAME': config("DB_DATABASE", default=""),
-    #     'USER': config("DB_USERNAME", default=""),
-    #     'PASSWORD': config("DB_PASSWORD", default=""),
-    #     'HOST': config("DB_SOCKET", default=""),
-    #     'PORT': config("DB_PORT", default="5432"),
-    #     'ATOMIC_REQUESTS': True
-    # }
-    'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost/postgres',
-        conn_max_age=600
-    )
+    "default": {
+        'ENGINE': config("DB_ENGINE", default="django.db.backends.postgresql"),
+        'NAME': config("DB_DATABASE", default=""),
+        'USER': config("DB_USERNAME", default=""),
+        'PASSWORD': config("DB_PASSWORD", default=""),
+        'HOST': config("DB_SOCKET", default=""),
+        'PORT': config("DB_PORT", default="5432"),
+    }
+}
+
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+DATABASES = {
+    "default": {
+        'ENGINE': config("DB_ENGINE", default="django.db.backends.postgresql"),
+        'NAME': config("DB_DATABASE", default=""),
+        'USER': config("DB_USERNAME", default=""),
+        'PASSWORD': config("DB_PASSWORD", default=""),
+        'HOST': config("DB_SOCKET", default=""),
+        'PORT': config("DB_PORT", default="5432"),
+        'ATOMIC_REQUESTS': True
+    }
+    # 'default': dj_database_url.config(
+    #     default='postgresql://postgres:postgres@localhost/postgres',
+    #     conn_max_age=600
+    # )
 }
 
 
@@ -133,18 +146,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+# STATIC_URL = 'static/'
+# STATICFILES_DIRS = [BASE_DIR / "static"]
 
-if not DEBUG:
-    # Tell Django to copy statics to the `staticfiles` directory
-    # in your application directory on Render.
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    # Turn on Whitenoise storage backend that takes care of compressing static files
-    # and creating unique names for each version so they can safely be cached forever.
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-LOGIN_URL = '/signin'
+# if not DEBUG:
+#     # Tell Django to copy statics to the `staticfiles` directory
+#     # in your application directory on Render.
+#     # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+#     # Turn on Whitenoise storage backend that takes care of compressing static files
+#     # and creating unique names for each version so they can safely be cached forever.
+#     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# LOGIN_URL = '/signin'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
